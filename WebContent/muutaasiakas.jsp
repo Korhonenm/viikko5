@@ -11,7 +11,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-
 <form id="tiedot">
 	<table>
 		<thead>	
@@ -32,10 +31,11 @@
 				<td><input type="text" name="sukunimi" id="sukunimi"></td>
 				<td><input type="text" name="puhelin" id="puhelin"></td>
 				<td><input type="text" name="sposti" id="sposti"></td> 
-				<td><input type="submit" id="tallenna" value="Lis‰‰"></td>
+				<td><input type="submit" id="tallenna" value="Hyv‰ksy"></td>
 			</tr>
 		</tbody>
 	</table>
+	<input type="hidden" name="asiakas_id" id="asiakas_id">	
 </form>
 <span id="ilmo"></span>
 </body>
@@ -44,6 +44,15 @@ $(document).ready(function(){
 	$("#takaisin").click(function(){
 		document.location="listaaasiakkaat.jsp";
 	});
+	
+	var asiakas_id = requestURLParam("asiakas_id"); //Funktio lˆytyy scripts/main.js 	
+	$.ajax({url:"asiakkaat/haeyksi/"+asiakas_id, type:"GET", dataType:"json", success:function(result){		
+		$("#asiakas_id").val(result.asiakas_id);
+		$("#etunimi").val(result.etunimi);	
+		$("#sukunimi").val(result.sukunimi);
+		$("#puhelin").val(result.puhelin);
+		$("#sposti").val(result.sposti);			
+    }});
 	$("#tiedot").validate({						
 		rules: {
 			etunimi:  {
@@ -83,23 +92,23 @@ $(document).ready(function(){
 			
 		},			
 		submitHandler: function(form) {	
-			lisaaTiedot();
+			paivitaTiedot();
 		}		
 	}); 
 	$("#etunimi").focus();
 });
-//funktio tietojen lis‰‰mist‰ varten. Kutsutaan backin POST-metodia ja v‰litet‰‰n kutsun mukana uudet tiedot json-stringin‰.
-//POST /autot/
-function lisaaTiedot(){	
+
+function paivitaTiedot(){	
 	var formJsonStr = formDataJsonStr($("#tiedot").serializeArray()); //muutetaan lomakkeen tiedot json-stringiksi
-	$.ajax({url:"asiakkaat", data:formJsonStr, type:"POST", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}       
+	$.ajax({url:"asiakkaat", data:formJsonStr, type:"PUT", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}       
 		if(result.response==0){
-      	$("#ilmo").html("Asiakkaan lis‰‰minen ep‰onnistui.");
+      	$("#ilmo").html("Asiakkaan p‰ivitt‰minen ep‰onnistui.");
       }else if(result.response==1){			
-      	$("#ilmo").html("Asiakkaan lis‰‰minen onnistui.");
+      	$("#ilmo").html("Asiakkaan p‰ivitt‰minen onnistui.");
       	$("#etunimi", "#sukunimi", "#puhelin", "#sposti").val("");
 		}
   }});	
 }
 </script>
+
 </html>
